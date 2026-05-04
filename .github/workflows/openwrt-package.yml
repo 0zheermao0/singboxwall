@@ -43,8 +43,8 @@ jobs:
         run: |
           luci-app-singboxwall/tests/run-tests.sh
 
-  sdk-package-metadata:
-    name: OpenWrt 23.05 SDK package metadata
+  openwrt-metadata:
+    name: OpenWrt 23.05 package metadata
     runs-on: ubuntu-22.04
     timeout-minutes: 45
     steps:
@@ -63,6 +63,5 @@ jobs:
         working-directory: openwrt
         run: |
           ./scripts/feeds update packages luci
-          ./scripts/feeds install luci-app-singboxwall
           make defconfig
           grep -q '^CONFIG_PACKAGE_luci-app-singboxwall' tmp/.config-package.in
