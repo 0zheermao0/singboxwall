@@ -66,14 +66,14 @@ jobs:
           mkdir sdk
           tar -xJf openwrt-sdk.tar.xz -C sdk --strip-components=1
 
-      - name: Install package into LuCI feed
+      - name: Pin OpenWrt 23.05 package metadata
         run: |
           printf '%s\n' \
             'src-git packages https://git.openwrt.org/feed/packages.git^b5ed85f6e' \
             'src-git luci https://git.openwrt.org/project/luci.git^63ba3cba5b' \
             'src-git routing https://git.openwrt.org/feed/routing.git;openwrt-23.05' \
             'src-git telephony https://git.openwrt.org/feed/telephony.git;openwrt-23.05' \
-            > sdk/feeds.conf
+            > sdk/feeds.conf.default
           cd sdk
           ./scripts/feeds update -a
           rm -rf feeds/luci/applications/luci-app-singboxwall
