@@ -46,6 +46,7 @@ jobs:
   build-openwrt-2305:
     name: Build OpenWrt 23.05 x86/64 package
     runs-on: ubuntu-22.04
+    timeout-minutes: 20
     env:
       SDK_URL: https://downloads.openwrt.org/releases/23.05.5/targets/x86/64/openwrt-sdk-23.05.5-x86-64_gcc-12.3.0_musl.Linux-x86_64.tar.xz
       SDK_SHA256: 9e5b6813a3f810123391f5f3ea10dfd1c14be1a880f410c70ec4424bbd1573d2
@@ -72,8 +73,8 @@ jobs:
       - name: Update feeds
         working-directory: sdk
         run: |
-          ./scripts/feeds update -a
-          ./scripts/feeds install -a
+          ./scripts/feeds update luci packages
+          ./scripts/feeds install luci-base luci-lib-jsonc
 
       - name: Install package into SDK
         run: |
@@ -84,8 +85,6 @@ jobs:
       - name: Configure package
         working-directory: sdk
         run: |
-          make defconfig
-          ./scripts/feeds install luci-base luci-lib-jsonc || true
           ./scripts/feeds update -i luci
           ./scripts/feeds install luci-app-singboxwall
           echo 'CONFIG_PACKAGE_luci-app-singboxwall=m' >> .config
@@ -94,7 +93,7 @@ jobs:
       - name: Compile package
         working-directory: sdk
         run: |
-          make package/feeds/luci/luci-app-singboxwall/compile V=s
+          make package/feeds/luci/luci-app-singboxwall/{clean,compile} V=s -j1
 
       - name: Upload package artifacts
         uses: actions/upload-artifact@v4
