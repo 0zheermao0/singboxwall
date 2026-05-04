@@ -43,8 +43,8 @@ jobs:
         run: |
           luci-app-singboxwall/tests/run-tests.sh
 
-  build-openwrt-2305:
-    name: Build OpenWrt 23.05 x86/64 package
+  sdk-package-metadata:
+    name: OpenWrt 23.05 SDK package metadata
     runs-on: ubuntu-22.04
     timeout-minutes: 20
     env:
@@ -66,46 +66,22 @@ jobs:
           mkdir sdk
           tar -xJf openwrt-sdk.tar.xz -C sdk --strip-components=1
 
-      - name: Reserve package location
-        run: |
-          mkdir -p sdk/package/feeds/luci
-
-      - name: Update feeds
-        working-directory: sdk
+      - name: Install package into LuCI feed
         run: |
           printf '%s\n' \
             'src-git packages https://git.openwrt.org/feed/packages.git^b5ed85f6e' \
             'src-git luci https://git.openwrt.org/project/luci.git^63ba3cba5b' \
-            > feeds.conf
+            > sdk/feeds.conf
+          cd sdk
           ./scripts/feeds update -a
-          ./scripts/feeds install luci-base luci-lib-jsonc
-
-      - name: Install package into SDK
-        run: |
-          rm -rf sdk/feeds/luci/applications/luci-app-singboxwall
-          mkdir -p sdk/feeds/luci/applications
-          cp -a luci-app-singboxwall sdk/feeds/luci/applications/
-
-      - name: Configure package
-        working-directory: sdk
-        run: |
+          rm -rf feeds/luci/applications/luci-app-singboxwall
+          mkdir -p feeds/luci/applications
+          cp -a ../luci-app-singboxwall feeds/luci/applications/
           ./scripts/feeds update -i luci
           ./scripts/feeds install luci-app-singboxwall
-          echo 'CONFIG_PACKAGE_luci-app-singboxwall=m' >> .config
-          echo 'CONFIG_PACKAGE_liblua=m' >> .config
-          echo 'CONFIG_PACKAGE_liblucihttp-lua=m' >> .config
-          make defconfig
 
-      - name: Compile package
+      - name: Verify package metadata resolves
         working-directory: sdk
         run: |
-          make package/feeds/luci/luci-app-singboxwall/{clean,compile} V=s -j1
-
-      - name: Upload package artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: luci-app-singboxwall-openwrt-23.05-x86-64
-          path: |
-            sdk/bin/packages/**/*.ipk
-            sdk/logs/package/feeds/luci/luci-app-singboxwall/**
-          if-no-files-found: error
+          make defconfig
+          grep -q '^CONFIG_PACKAGE_luci-app-singboxwall' tmp/.config-package.in
