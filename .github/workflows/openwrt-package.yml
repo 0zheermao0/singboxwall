@@ -73,6 +73,10 @@ jobs:
       - name: Update feeds
         working-directory: sdk
         run: |
+          printf '%s\n' \
+            'src-git packages https://git.openwrt.org/feed/packages.git^b5ed85f6e' \
+            'src-git luci https://git.openwrt.org/project/luci.git^63ba3cba5b' \
+            > feeds.conf
           ./scripts/feeds update luci packages
           ./scripts/feeds install luci-base luci-lib-jsonc
 
