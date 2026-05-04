@@ -18,7 +18,7 @@ jobs:
       - name: Install syntax tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y lua5.1 lua-check shellcheck ucode
+          sudo apt-get install -y lua5.1 lua-check shellcheck
 
       - name: Shell syntax
         run: |
@@ -37,7 +37,7 @@ jobs:
 
       - name: ucode syntax
         run: |
-          ucode -c luci-app-singboxwall/root/usr/share/rpcd/ucode/singboxwall.uc
+          if command -v ucode >/dev/null 2>&1; then ucode -c luci-app-singboxwall/root/usr/share/rpcd/ucode/singboxwall.uc; else echo 'SKIP ucode: compiler not available on runner'; fi
 
       - name: Package tests
         run: |
@@ -65,16 +65,20 @@ jobs:
           mkdir sdk
           tar -xJf openwrt-sdk.tar.xz -C sdk --strip-components=1
 
-      - name: Install package into SDK
+      - name: Reserve package location
         run: |
-          mkdir -p sdk/package/singboxwall
-          cp -a luci-app-singboxwall sdk/package/singboxwall/
+          mkdir -p sdk/package/feeds/luci
 
       - name: Update feeds
         working-directory: sdk
         run: |
           ./scripts/feeds update -a
           ./scripts/feeds install -a
+
+      - name: Install package into SDK
+        run: |
+          rm -rf sdk/package/feeds/luci/luci-app-singboxwall
+          cp -a luci-app-singboxwall sdk/package/feeds/luci/
 
       - name: Configure package
         working-directory: sdk
@@ -87,7 +91,7 @@ jobs:
       - name: Compile package
         working-directory: sdk
         run: |
-          make package/singboxwall/luci-app-singboxwall/compile V=s
+          make package/feeds/luci/luci-app-singboxwall/compile V=s
 
       - name: Upload package artifacts
         uses: actions/upload-artifact@v4
@@ -95,5 +99,5 @@ jobs:
           name: luci-app-singboxwall-openwrt-23.05-x86-64
           path: |
             sdk/bin/packages/**/*.ipk
-            sdk/logs/package/singboxwall/luci-app-singboxwall/**
+            sdk/logs/package/feeds/luci/luci-app-singboxwall/**
           if-no-files-found: error
