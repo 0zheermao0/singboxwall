@@ -88,6 +88,8 @@ jobs:
           ./scripts/feeds update -i luci
           ./scripts/feeds install luci-app-singboxwall
           echo 'CONFIG_PACKAGE_luci-app-singboxwall=m' >> .config
+          echo 'CONFIG_PACKAGE_liblua=m' >> .config
+          echo 'CONFIG_PACKAGE_liblucihttp-lua=m' >> .config
           make defconfig
 
       - name: Compile package
