@@ -77,7 +77,7 @@ jobs:
             'src-git packages https://git.openwrt.org/feed/packages.git^b5ed85f6e' \
             'src-git luci https://git.openwrt.org/project/luci.git^63ba3cba5b' \
             > feeds.conf
-          ./scripts/feeds update luci packages
+          ./scripts/feeds update -a
           ./scripts/feeds install luci-base luci-lib-jsonc
 
       - name: Install package into SDK
