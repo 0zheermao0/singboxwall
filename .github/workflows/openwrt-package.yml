@@ -55,13 +55,19 @@ jobs:
         run: |
           git clone --depth 1 --branch openwrt-23.05 https://github.com/openwrt/openwrt.git openwrt
 
-      - name: Install package into source tree
+      - name: Install package into LuCI feed
         run: |
-          cp -a luci-app-singboxwall openwrt/package/luci-app-singboxwall
+          mkdir -p openwrt/feeds/luci/applications
+          cp -a luci-app-singboxwall openwrt/feeds/luci/applications/
 
       - name: Verify package metadata resolves
         working-directory: openwrt
         run: |
           ./scripts/feeds update packages luci
+          rm -rf openwrt/feeds/luci/applications/luci-app-singboxwall
+          mkdir -p openwrt/feeds/luci/applications
+          cp -a ../luci-app-singboxwall openwrt/feeds/luci/applications/
+          ./scripts/feeds update -i luci
+          ./scripts/feeds install luci-app-singboxwall
           make defconfig
           grep -q '^CONFIG_PACKAGE_luci-app-singboxwall' tmp/.config-package.in
