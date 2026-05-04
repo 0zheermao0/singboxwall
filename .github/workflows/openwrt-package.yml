@@ -71,6 +71,8 @@ jobs:
           printf '%s\n' \
             'src-git packages https://git.openwrt.org/feed/packages.git^b5ed85f6e' \
             'src-git luci https://git.openwrt.org/project/luci.git^63ba3cba5b' \
+            'src-git routing https://git.openwrt.org/feed/routing.git;openwrt-23.05' \
+            'src-git telephony https://git.openwrt.org/feed/telephony.git;openwrt-23.05' \
             > sdk/feeds.conf
           cd sdk
           ./scripts/feeds update -a
