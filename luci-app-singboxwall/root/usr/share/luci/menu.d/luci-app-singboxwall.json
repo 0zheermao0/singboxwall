@@ -1,0 +1,92 @@
+{
+	"admin/services/singboxwall": {
+		"title": "SingBoxWall",
+		"order": 60,
+		"action": {
+			"type": "firstchild"
+		},
+		"depends": {
+			"acl": [ "luci-app-singboxwall" ]
+		}
+	},
+	"admin/services/singboxwall/overview": {
+		"title": "Overview",
+		"order": 10,
+		"action": {
+			"type": "view",
+			"path": "singboxwall/overview"
+		}
+	},
+	"admin/services/singboxwall/nodes": {
+		"title": "Nodes",
+		"order": 20,
+		"action": {
+			"type": "view",
+			"path": "singboxwall/nodes"
+		}
+	},
+	"admin/services/singboxwall/groups": {
+		"title": "Policy Groups",
+		"order": 30,
+		"action": {
+			"type": "view",
+			"path": "singboxwall/groups"
+		}
+	},
+	"admin/services/singboxwall/rules": {
+		"title": "Rules",
+		"order": 40,
+		"action": {
+			"type": "view",
+			"path": "singboxwall/rules"
+		}
+	},
+	"admin/services/singboxwall/access-control": {
+		"title": "Access Control",
+		"order": 50,
+		"action": {
+			"type": "view",
+			"path": "singboxwall/access-control"
+		}
+	},
+	"admin/services/singboxwall/dns": {
+		"title": "DNS",
+		"order": 60,
+		"action": {
+			"type": "view",
+			"path": "singboxwall/dns"
+		}
+	},
+	"admin/services/singboxwall/subscriptions": {
+		"title": "Subscriptions",
+		"order": 70,
+		"action": {
+			"type": "view",
+			"path": "singboxwall/subscriptions"
+		}
+	},
+	"admin/services/singboxwall/server": {
+		"title": "Server",
+		"order": 80,
+		"action": {
+			"type": "view",
+			"path": "singboxwall/server"
+		}
+	},
+	"admin/services/singboxwall/backup": {
+		"title": "Backup / Restore",
+		"order": 90,
+		"action": {
+			"type": "view",
+			"path": "singboxwall/backup"
+		}
+	},
+	"admin/services/singboxwall/log": {
+		"title": "Log",
+		"order": 100,
+		"action": {
+			"type": "view",
+			"path": "singboxwall/log"
+		}
+	}
+}

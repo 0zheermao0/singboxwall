@@ -1,0 +1,22 @@
+#!/bin/sh
+
+set -eu
+
+DATA_DIR='/etc/singboxwall'
+CONFIG='/etc/config/singboxwall'
+
+mkdir -p "$DATA_DIR" "$DATA_DIR/rules" "$DATA_DIR/subscriptions" "$DATA_DIR/backups"
+chmod 0700 "$DATA_DIR" "$DATA_DIR/backups"
+chmod 0755 "$DATA_DIR/rules" "$DATA_DIR/subscriptions"
+
+if [ ! -s "$CONFIG" ] && [ -s /rom/etc/config/singboxwall ]; then
+	cp /rom/etc/config/singboxwall "$CONFIG"
+fi
+
+if [ -s "$CONFIG" ] && ! uci -q get singboxwall.global.clash_api_secret >/dev/null; then
+	secret="$(dd if=/dev/urandom bs=16 count=1 2>/dev/null | hexdump -ve '1/1 "%02x"')"
+	uci -q set singboxwall.global.clash_api_secret="$secret"
+	uci -q commit singboxwall
+fi
+
+exit 0

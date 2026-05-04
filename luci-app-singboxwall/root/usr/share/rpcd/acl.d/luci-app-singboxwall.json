@@ -1,0 +1,27 @@
+{
+	"luci-app-singboxwall": {
+		"description": "Grant LuCI access to SingBoxWall",
+		"read": {
+			"uci": [ "singboxwall" ],
+			"ubus": {
+				"singboxwall": [ "status", "tail_log" ],
+				"service": [ "list" ]
+			},
+			"file": {
+				"/etc/singboxwall/*": [ "read" ],
+				"/tmp/etc/singboxwall/*": [ "read" ],
+				"/var/log/singboxwall.log": [ "read" ]
+			}
+		},
+		"write": {
+			"uci": [ "singboxwall" ],
+			"ubus": {
+				"singboxwall": [ "check", "restart", "generate", "urltest", "update_subscriptions", "backup_create", "backup_restore", "rule_update" ]
+			},
+			"file": {
+				"/etc/singboxwall/*": [ "write" ],
+				"/tmp/etc/singboxwall/*": [ "write" ]
+			}
+		}
+	}
+}

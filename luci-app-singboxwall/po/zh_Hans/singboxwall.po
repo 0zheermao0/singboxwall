@@ -1,0 +1,76 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: luci-app-singboxwall\n"
+"Language: zh_Hans\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "SingBoxWall"
+msgstr "SingBoxWall"
+
+msgid "Overview"
+msgstr "概览"
+
+msgid "Nodes"
+msgstr "节点"
+
+msgid "Policy Groups"
+msgstr "策略组"
+
+msgid "Rules"
+msgstr "规则"
+
+msgid "Access Control"
+msgstr "访问控制"
+
+msgid "DNS"
+msgstr "DNS"
+
+msgid "Subscriptions"
+msgstr "订阅"
+
+msgid "Server"
+msgstr "服务端"
+
+msgid "Backup / Restore"
+msgstr "备份 / 恢复"
+
+msgid "Log"
+msgstr "日志"
+
+msgid "Enable service"
+msgstr "启用服务"
+
+msgid "Generate and check"
+msgstr "生成并检查"
+
+msgid "Restart service"
+msgstr "重启服务"
+
+msgid "Outbound Nodes"
+msgstr "出站节点"
+
+msgid "Route Rules"
+msgstr "路由规则"
+
+msgid "Rule Sets"
+msgstr "规则集"
+
+msgid "Client Rules"
+msgstr "客户端规则"
+
+msgid "Server Inbounds"
+msgstr "服务端入站"
+
+msgid "Update subscriptions"
+msgstr "更新订阅"
+
+msgid "Update remote rule-sets"
+msgstr "更新远程规则集"
+
+msgid "Create backup"
+msgstr "创建备份"
+
+msgid "Restore backup"
+msgstr "恢复备份"

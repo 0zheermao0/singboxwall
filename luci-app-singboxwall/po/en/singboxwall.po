@@ -1,0 +1,19 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: luci-app-singboxwall\n"
+"Language: en\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "SingBoxWall"
+msgstr "SingBoxWall"
+
+msgid "Policy Groups"
+msgstr "Policy Groups"
+
+msgid "Access Control"
+msgstr "Access Control"
+
+msgid "Backup / Restore"
+msgstr "Backup / Restore"

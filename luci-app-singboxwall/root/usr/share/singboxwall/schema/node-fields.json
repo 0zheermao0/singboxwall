@@ -1,0 +1,12 @@
+{
+	"shadowsocks": ["server", "server_port", "method", "password", "plugin", "plugin_opts", "network", "udp_over_tcp", "tls", "multiplex"],
+	"vmess": ["server", "server_port", "uuid", "security", "alter_id", "global_padding", "authenticated_length", "network", "tls", "packet_encoding", "multiplex", "transport"],
+	"trojan": ["server", "server_port", "password", "network", "tls", "multiplex", "transport"],
+	"vless": ["server", "server_port", "uuid", "flow", "network", "tls", "packet_encoding", "multiplex", "transport"],
+	"hysteria2": ["server", "server_port", "password", "up_mbps", "down_mbps", "tls", "obfs", "obfs_password"],
+	"tuic": ["server", "server_port", "uuid", "password", "congestion_control", "udp_relay_mode", "zero_rtt_handshake", "heartbeat", "tls"],
+	"anytls": ["server", "server_port", "password", "tls"],
+	"wireguard": ["server", "server_port", "local_address", "private_key", "peer_public_key", "pre_shared_key", "reserved"],
+	"ssh": ["server", "server_port", "user", "password", "private_key", "private_key_path", "host_key", "host_key_algorithms"],
+	"naive": ["server", "server_port", "username", "password", "network", "tls"]
+}

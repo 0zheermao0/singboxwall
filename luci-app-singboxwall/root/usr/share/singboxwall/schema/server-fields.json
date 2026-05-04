@@ -1,0 +1,9 @@
+{
+	"shadowsocks": ["listen", "listen_port", "method", "password", "network", "multiplex"],
+	"trojan": ["listen", "listen_port", "users", "password", "tls", "transport", "multiplex"],
+	"vless": ["listen", "listen_port", "users", "uuid", "flow", "tls", "transport"],
+	"vmess": ["listen", "listen_port", "users", "uuid", "alter_id", "security", "tls", "transport"],
+	"hysteria2": ["listen", "listen_port", "users", "password", "up_mbps", "down_mbps", "tls", "obfs", "obfs_password"],
+	"tuic": ["listen", "listen_port", "users", "uuid", "password", "congestion_control", "tls"],
+	"anytls": ["listen", "listen_port", "users", "password", "tls"]
+}

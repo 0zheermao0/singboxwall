@@ -1,0 +1,35 @@
+# macOS/editor noise
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Local dependency/install artifacts
+node_modules/
+package.json
+package-lock.json
+npm-debug.log*
+
+# OpenWrt build artifacts
+bin/
+build_dir/
+staging_dir/
+tmp/
+dlcaches/
+feeds/
+feeds.conf
+feeds.conf.default
+.config
+.config.old
+*.ipk
+*.apk
+*.buildinfo
+*.manifest
+*.tar.gz
+*.tar.xz
+*.log
+
+# Test output
+luci-app-singboxwall/tests/out/

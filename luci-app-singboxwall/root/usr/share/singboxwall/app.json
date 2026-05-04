@@ -1,0 +1,20 @@
+{
+	"name": "singboxwall",
+	"package": "luci-app-singboxwall",
+	"version": "0.1.0",
+	"license": "GPL-3.0-or-later",
+	"sing_box_min_version": "1.13.11",
+	"sing_box_1_14_gated_features": [
+		"route.rules[].source_mac_address",
+		"route.rules[].source_hostname",
+		"experimental.cache_file.store_dns",
+		"route.rule_set[].http_client"
+	],
+	"unsupported_clean_cutover": [
+		"xray-core",
+		"haproxy",
+		"chinadns-ng",
+		"iptables transparent proxy",
+		"dnsmasq ipset/nftset orchestration"
+	]
+}

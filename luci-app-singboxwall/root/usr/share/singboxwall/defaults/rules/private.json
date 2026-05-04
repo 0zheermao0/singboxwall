@@ -1,0 +1,15 @@
+{
+	"version": 3,
+	"rules": [
+		{
+			"ip_is_private": true
+		},
+		{
+			"domain_suffix": [
+				"lan",
+				"local",
+				"home.arpa"
+			]
+		}
+	]
+}

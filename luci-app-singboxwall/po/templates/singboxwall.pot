@@ -1,0 +1,74 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: luci-app-singboxwall\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "SingBoxWall"
+msgstr ""
+
+msgid "Overview"
+msgstr ""
+
+msgid "Nodes"
+msgstr ""
+
+msgid "Policy Groups"
+msgstr ""
+
+msgid "Rules"
+msgstr ""
+
+msgid "Access Control"
+msgstr ""
+
+msgid "DNS"
+msgstr ""
+
+msgid "Subscriptions"
+msgstr ""
+
+msgid "Server"
+msgstr ""
+
+msgid "Backup / Restore"
+msgstr ""
+
+msgid "Log"
+msgstr ""
+
+msgid "Enable service"
+msgstr ""
+
+msgid "Generate and check"
+msgstr ""
+
+msgid "Restart service"
+msgstr ""
+
+msgid "Outbound Nodes"
+msgstr ""
+
+msgid "Route Rules"
+msgstr ""
+
+msgid "Rule Sets"
+msgstr ""
+
+msgid "Client Rules"
+msgstr ""
+
+msgid "Server Inbounds"
+msgstr ""
+
+msgid "Update subscriptions"
+msgstr ""
+
+msgid "Update remote rule-sets"
+msgstr ""
+
+msgid "Create backup"
+msgstr ""
+
+msgid "Restore backup"
+msgstr ""
