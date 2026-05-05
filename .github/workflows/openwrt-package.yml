@@ -66,13 +66,24 @@ jobs:
         run: |
           cp -a luci-app-singboxwall sdk/package/luci-app-singboxwall
 
+      - name: Pin OpenWrt release feeds
+        working-directory: sdk
+        run: |
+          cp feeds.conf.default feeds.conf.default.orig
+          printf '%s\n' \
+            'src-git packages https://git.openwrt.org/feed/packages.git^b5ed85f6e' \
+            'src-git luci https://git.openwrt.org/project/luci.git^63ba3cba5b' \
+            'src-git routing https://git.openwrt.org/feed/routing.git^e351d1e' \
+            'src-git telephony https://git.openwrt.org/feed/telephony.git^98c8a5a' \
+            > feeds.conf.default
+
       - name: Build package
         working-directory: sdk
         run: |
-          ./scripts/feeds update packages luci
-          ./scripts/feeds install luci-base luci-lib-jsonc lua libuci-lua sing-box jsonfilter ucode uclient-fetch ca-bundle ip-full nftables
+          ./scripts/feeds update -a
+          ./scripts/feeds install -a
           echo 'CONFIG_PACKAGE_luci-app-singboxwall=m' >> .config
           make defconfig
           grep -q '^CONFIG_PACKAGE_luci-app-singboxwall=m' .config
-          make package/feeds/packages/lua/compile V=s
+          make package/feeds/packages/lua/host/compile package/feeds/packages/lua/compile V=s
           make package/luci-app-singboxwall/compile V=s
