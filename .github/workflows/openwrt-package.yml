@@ -83,6 +83,10 @@ jobs:
           ./scripts/feeds update -a
           ./scripts/feeds install -a
           echo 'CONFIG_PACKAGE_luci-app-singboxwall=m' >> .config
+          echo 'CONFIG_PACKAGE_liblua=m' >> .config
+          echo 'CONFIG_PACKAGE_lua=m' >> .config
+          echo 'CONFIG_PACKAGE_libjson-c=m' >> .config
+          echo 'CONFIG_PACKAGE_libucode=m' >> .config
           make defconfig
           grep -q '^CONFIG_PACKAGE_luci-app-singboxwall=m' .config
           make package/luci-app-singboxwall/compile V=s
