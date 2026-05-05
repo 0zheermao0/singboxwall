@@ -82,12 +82,16 @@ jobs:
         run: |
           ./scripts/feeds update -a
           ./scripts/feeds install -a
+          touch .config
+          make defconfig
+
 
           # This package repository owns luci-app-singboxwall packaging. The SDK
-          # smoke test intentionally verifies package metadata and payload only;
-          # selecting the package with make defconfig would build the full
-          # runtime dependency closure (luci-base, sing-box, nftables, kernel
-          # modules), which belongs to OpenWrt image/feed integration testing.
+          # smoke test intentionally verifies package metadata and payload only.
+          # Keep the SDK config at its default selection: selecting this package
+          # through defconfig would build the full runtime dependency closure
+          # (luci-base, sing-box, nftables, kernel modules), which belongs to
+          # OpenWrt image/feed integration testing.
           make package/luci-app-singboxwall/clean V=s CONFIG_PACKAGE_luci-app-singboxwall=m
           make package/luci-app-singboxwall/compile V=s CONFIG_PACKAGE_luci-app-singboxwall=m
 
