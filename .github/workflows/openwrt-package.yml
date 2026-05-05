@@ -85,5 +85,4 @@ jobs:
           echo 'CONFIG_PACKAGE_luci-app-singboxwall=m' >> .config
           make defconfig
           grep -q '^CONFIG_PACKAGE_luci-app-singboxwall=m' .config
-          make package/feeds/packages/lua/host/compile package/feeds/packages/lua/compile V=s
           make package/luci-app-singboxwall/compile V=s

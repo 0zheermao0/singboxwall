@@ -7,7 +7,7 @@ PKG_LICENSE:=GPL-3.0-or-later
 PKG_MAINTAINER:=SingBoxWall maintainers
 
 LUCI_TITLE:=LuCI support for SingBoxWall
-LUCI_DEPENDS:=+luci-base +sing-box +jsonfilter +ucode +uclient-fetch +ca-bundle +ip-full +nftables +kmod-tun +lua +libuci-lua +luci-lib-jsonc
+LUCI_DEPENDS:=+luci-base +sing-box +jsonfilter +ucode +uclient-fetch +ca-bundle +ip-full +nftables +kmod-tun
 LUCI_PKGARCH:=all
 
 define Package/$(PKG_NAME)/conffiles
