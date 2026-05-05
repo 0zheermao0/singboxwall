@@ -4,8 +4,13 @@ on:
   push:
     branches:
       - main
+    tags:
+      - 'v*'
   pull_request:
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   static-checks:
@@ -77,7 +82,7 @@ jobs:
             'src-git telephony https://git.openwrt.org/feed/telephony.git^98c8a5a' \
             > feeds.conf.default
 
-      - name: Verify package metadata and payload
+      - name: Verify package metadata and build IPK payload
         working-directory: sdk
         run: |
           ./scripts/feeds update -a
@@ -87,26 +92,37 @@ jobs:
 
 
           # This package repository owns luci-app-singboxwall packaging. The SDK
-          # smoke test intentionally verifies package metadata and payload only.
-          # Keep the SDK config at its default selection: selecting this package
-          # through defconfig would build the full runtime dependency closure
-          # (luci-base, sing-box, nftables, kernel modules), which belongs to
-          # OpenWrt image/feed integration testing.
+          # smoke test intentionally verifies package metadata and the package
+          # payload without selecting this package through defconfig. Selecting
+          # it there would build the full runtime dependency closure (luci-base,
+          # sing-box, nftables, kernel modules), which belongs to OpenWrt
+          # image/feed integration testing.
           grep -q '^Source-Makefile: package/luci-app-singboxwall/Makefile$' tmp/.packageinfo
           grep -q '^Package: luci-app-singboxwall$' tmp/.packageinfo
           grep -q '^Depends: .*luci-base' tmp/.packageinfo
           grep -q '^Depends: .*sing-box' tmp/.packageinfo
 
-          pkgroot="$PWD/build_dir/target-x86_64_musl/luci-app-singboxwall/ipkg-all/luci-app-singboxwall"
+          pkg_version="$(awk -F:= '/^PKG_VERSION:=/ {print $2}' package/luci-app-singboxwall/Makefile)"
+          pkg_release="$(awk -F:= '/^PKG_RELEASE:=/ {print $2}' package/luci-app-singboxwall/Makefile)"
+          pkgroot="$PWD/build_dir/target_x86_64_musl/luci-app-singboxwall/ipkg-all/luci-app-singboxwall"
           rm -rf "$pkgroot"
           mkdir -p "$pkgroot/www" "$pkgroot/CONTROL"
           cp -a package/luci-app-singboxwall/htdocs/. "$pkgroot/www/"
           cp -a package/luci-app-singboxwall/root/. "$pkgroot/"
-          printf 'Package: luci-app-singboxwall\nVersion: 0.1.0-1\nArchitecture: all\nMaintainer: SingBoxWall maintainers\nDescription: CI package payload smoke test\n' > "$pkgroot/CONTROL/control"
+          printf '%s\n' \
+            'Package: luci-app-singboxwall' \
+            "Version: ${pkg_version}-${pkg_release}" \
+            'Architecture: all' \
+            'Maintainer: SingBoxWall maintainers' \
+            'Section: luci' \
+            'Priority: optional' \
+            'Depends: luci-base, sing-box, jsonfilter, ucode, uclient-fetch, ca-bundle, ip-full, nftables, kmod-tun' \
+            'Description: SingBoxWall LuCI application for sing-box transparent proxying.' \
+            > "$pkgroot/CONTROL/control"
           mkdir -p "$PWD/bin/packages/x86_64/base"
 
           ./scripts/ipkg-build "$pkgroot" "$PWD/bin/packages/x86_64/base"
-          test -f "$PWD/bin/packages/x86_64/base/luci-app-singboxwall_0.1.0-1_all.ipk"
+          test -f "$PWD/bin/packages/x86_64/base/luci-app-singboxwall_${pkg_version}-${pkg_release}_all.ipk"
           test -f "$pkgroot/etc/config/singboxwall"
           test -x "$pkgroot/etc/init.d/singboxwall"
           test -f "$pkgroot/usr/share/rpcd/ucode/singboxwall.uc"
@@ -116,3 +132,9 @@ jobs:
           test -f "$pkgroot/www/luci-static/resources/singboxwall/common.js"
           test -d "$pkgroot/www/luci-static/resources/view/singboxwall"
           find "$pkgroot" -type f | sort
+
+      - name: Upload IPK to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: sdk/bin/packages/x86_64/base/luci-app-singboxwall_*.ipk
