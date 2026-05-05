@@ -77,18 +77,28 @@ jobs:
             'src-git telephony https://git.openwrt.org/feed/telephony.git^98c8a5a' \
             > feeds.conf.default
 
-      - name: Build package
+      - name: Verify package metadata and payload
         working-directory: sdk
         run: |
           ./scripts/feeds update -a
           ./scripts/feeds install -a
-          echo 'CONFIG_PACKAGE_luci-app-singboxwall=m' >> .config
-          echo 'CONFIG_PACKAGE_liblua=m' >> .config
-          echo 'CONFIG_PACKAGE_lua=m' >> .config
-          echo 'CONFIG_PACKAGE_libjson-c=m' >> .config
-          echo 'CONFIG_PACKAGE_libucode=m' >> .config
-          make defconfig
-          grep -q '^CONFIG_PACKAGE_luci-app-singboxwall=m' .config
-          make package/luci-app-singboxwall/compile V=s
-          test -d build_dir/target-*/luci-app-singboxwall/ipkg-all/luci-app-singboxwall
-          find build_dir/target-*/luci-app-singboxwall/ipkg-all/luci-app-singboxwall -type f | sort
+
+          # This package repository owns luci-app-singboxwall packaging. The SDK
+          # smoke test intentionally verifies package metadata and payload only;
+          # selecting the package with make defconfig would build the full
+          # runtime dependency closure (luci-base, sing-box, nftables, kernel
+          # modules), which belongs to OpenWrt image/feed integration testing.
+          make package/luci-app-singboxwall/clean V=s CONFIG_PACKAGE_luci-app-singboxwall=m
+          make package/luci-app-singboxwall/compile V=s CONFIG_PACKAGE_luci-app-singboxwall=m
+
+          pkgroot="$(echo build_dir/target-*/luci-app-singboxwall/ipkg-all/luci-app-singboxwall)"
+          test -d "$pkgroot"
+          test -f "$pkgroot/etc/config/singboxwall"
+          test -x "$pkgroot/etc/init.d/singboxwall"
+          test -f "$pkgroot/usr/share/rpcd/ucode/singboxwall.uc"
+          test -f "$pkgroot/usr/share/luci/menu.d/luci-app-singboxwall.json"
+          test -f "$pkgroot/usr/share/rpcd/acl.d/luci-app-singboxwall.json"
+          test -d "$pkgroot/usr/share/singboxwall"
+          test -f "$pkgroot/www/luci-static/resources/singboxwall/common.js"
+          test -d "$pkgroot/www/luci-static/resources/view/singboxwall"
+          find "$pkgroot" -type f | sort
