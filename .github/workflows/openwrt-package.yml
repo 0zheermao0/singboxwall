@@ -85,7 +85,6 @@ jobs:
           echo 'CONFIG_PACKAGE_luci-app-singboxwall=m' >> .config
           make defconfig
           grep -q '^CONFIG_PACKAGE_luci-app-singboxwall=m' .config
-          make package/utils/lua/host/compile package/utils/lua/compile V=s
           make package/luci-app-singboxwall/compile V=s
           test -d build_dir/target-*/luci-app-singboxwall/ipkg-all/luci-app-singboxwall
           find build_dir/target-*/luci-app-singboxwall/ipkg-all/luci-app-singboxwall -type f | sort
