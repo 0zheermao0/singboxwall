@@ -102,8 +102,10 @@ local function update()
 			if url == "" then
 				warn("remote rule-set " .. tag .. " has no URL")
 			else
-				local ext = url:match("%.([A-Za-z0-9]+)$") or opt(s, "format", "source")
-				if ext ~= "srs" then ext = "json" end
+				local clean_url = url:gsub('[?#].*$', '')
+				local format = opt(s, "format", "source")
+				local ext = clean_url:match("%.([A-Za-z0-9]+)$") or format
+				if format == "binary" or ext == "srs" then ext = "srs" else ext = "json" end
 				local dest = data_dir .. "/rules/" .. tag .. "." .. ext
 				if download(url, dest) then
 					changed = changed + 1

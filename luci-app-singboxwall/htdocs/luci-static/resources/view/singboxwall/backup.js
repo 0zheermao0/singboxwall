@@ -23,8 +23,8 @@ return view.extend({
 		o = s.option(form.Button, '_restore', _('Restore backup'));
 		o.inputstyle = 'negative';
 		o.inputtitle = _('Restore backup');
-		o.onclick = function(section_id) {
-			let input = document.querySelector('[name="cbid.singboxwall.backup._restore_path"]');
+		o.onclick = function(ev, section_id) {
+			let input = document.getElementById('widget.cbid.singboxwall.' + section_id + '._restore_path') || document.getElementById('widget.cbid.singboxwall.backup._restore_path');
 			let path = input ? input.value : '';
 			return sbw.callBackupRestore(path).then(function(res) {
 				ui.addNotification(null, E('pre', [ sbw.renderCommandResult(res) ]));

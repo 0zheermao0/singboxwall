@@ -95,10 +95,13 @@ local function parse_standard(uri, scheme)
 	local q = parse_query(query)
 	local node = { protocol = scheme, label = url_decode(label ~= '' and label or host), server = host, server_port = tostring(port) }
 	if scheme == 'trojan' then node.password = url_decode(auth)
-	elseif scheme == 'vless' or scheme == 'vmess' or scheme == 'tuic' then node.uuid = url_decode(auth)
+	elseif scheme == 'vless' or scheme == 'vmess' then node.uuid = url_decode(auth)
+	elseif scheme == 'tuic' then
+		local uuid, password = auth:match('^([^:]+):(.+)$')
+		node.uuid = url_decode(uuid or auth)
+		node.password = url_decode(q.password or password or '')
 	elseif scheme == 'hysteria2' then node.password = url_decode(auth)
 	end
-	if scheme == 'tuic' and q.password then node.password = q.password end
 	if q.security == 'tls' or q.tls == '1' then node.tls_enabled = '1' end
 	if q.sni then node.server_name = q.sni end
 	if q.flow then node.flow = q.flow end
@@ -168,16 +171,27 @@ local function set_node(idx, node, subname)
 	uci:set('singboxwall', sid, 'subscription', subname)
 end
 
+local function clear_subscription_nodes(subname)
+	if not uci then return end
+	local remove = {}
+	uci:foreach('singboxwall', 'node', function(s)
+		if s.subscription == subname then remove[#remove + 1] = s['.name'] end
+	end)
+	for _, sid in ipairs(remove) do uci:delete('singboxwall', sid) end
+end
+
 local function update()
 	if not uci then warn('uci Lua module unavailable; cannot import subscriptions'); print('{"ok":false,"imported":0}'); return end
 	local count = 0
 	for _, sub in ipairs(load_subscriptions()) do
+		local subname = sub['.name'] or ''
+		clear_subscription_nodes(subname)
 		if tostring(sub.enabled or '1') == '1' then
 			local content = download(sub.url or '')
 			if content ~= '' and not content:match('://') then content = b64decode(content) end
 			for line in content:gmatch('[^\r\n]+') do
 				local node, err = parse_line(line)
-				if node then count = count + 1; set_node(count, node, sub['.name'] or '') else warn(err or 'unparsed line') end
+				if node then count = count + 1; set_node(count, node, subname) else warn(err or 'unparsed line') end
 			end
 		end
 	end

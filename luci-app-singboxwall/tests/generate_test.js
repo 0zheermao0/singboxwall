@@ -87,7 +87,7 @@ function generateFixture(fixtureName, extraSections = '') {
 
 	// The harness validates fixtures with a lightweight structural oracle instead of executing Lua.
 	// It intentionally fails if the generator no longer contains the expected safety gates.
-	assert(injected.includes('supports_114'), 'version gate missing');
+	assert(injected.includes('supports_1133'), 'strict_route version gate missing');
 	assert(injected.includes('source_mac_address'), 'ACL MAC support missing');
 	assert(injected.includes('rule_set'), 'rule-set support missing');
 	assert(!injected.includes('geosite'), 'deprecated geosite found');
@@ -119,5 +119,16 @@ config node 'bad'
 	option server_port '443'
 `);
 assert(invalid.sections.some(s => s.protocol === 'unknown'), 'invalid node fixture missing');
+
+const subscribeSource = fs.readFileSync(path.join(root, 'root/usr/share/singboxwall/subscribe.lua'), 'utf8');
+assert(subscribeSource.includes("auth:match('^([^:]+):(.+)$')"), 'TUIC auth split missing');
+assert(subscribeSource.includes('clear_subscription_nodes'), 'stale subscription cleanup missing');
+
+const backupSource = fs.readFileSync(path.join(root, 'root/usr/share/singboxwall/backup.lua'), 'utf8');
+assert(backupSource.includes('read_temp_dir'), 'restore temp_dir validation missing');
+assert(backupSource.includes('--exclude=etc/singboxwall/backups'), 'backup recursion exclude missing');
+
+const rulesSource = fs.readFileSync(path.join(root, 'root/usr/share/singboxwall/rules.lua'), 'utf8');
+assert(rulesSource.includes("url:gsub('[?#].*$', '')"), 'rule URL query stripping missing');
 
 console.log(JSON.stringify({ ok: true, fixtures: [ 'default', 'acl-114', 'invalid-node' ] }));

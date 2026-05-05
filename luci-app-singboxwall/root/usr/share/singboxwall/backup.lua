@@ -53,6 +53,12 @@ local function read_global()
 	backup_dir = data_dir .. "/backups"
 end
 
+local function read_temp_dir()
+	local out = capture("uci -q get singboxwall.global.temp_dir"):gsub("%s+$", "")
+	if out == "" then out = "/tmp/etc/singboxwall" end
+	return out
+end
+
 local function json_escape(s)
 	s = tostring(s or "")
 	return s:gsub('\\', '\\\\'):gsub('"', '\\"'):gsub('\n', '\\n')
@@ -93,8 +99,9 @@ local function generated_check()
 	local bin = capture("uci -q get singboxwall.global.sing_box_bin"):gsub("%s+$", "")
 	if bin == "" then bin = "/usr/bin/sing-box" end
 	if not run("[ -x " .. shell_quote(bin) .. " ]") then return false, "sing-box binary not executable: " .. bin end
-	if not run(shell_quote(bin) .. " check -c /tmp/etc/singboxwall/client.json") then return false, "sing-box client check failed after restore" end
-	if exists("/tmp/etc/singboxwall/server.json") and not run(shell_quote(bin) .. " check -c /tmp/etc/singboxwall/server.json") then return false, "sing-box server check failed after restore" end
+	local tmp_dir = read_temp_dir()
+	if not run(shell_quote(bin) .. " check -c " .. shell_quote(tmp_dir .. "/client.json")) then return false, "sing-box client check failed after restore" end
+	if exists(tmp_dir .. "/server.json") and not run(shell_quote(bin) .. " check -c " .. shell_quote(tmp_dir .. "/server.json")) then return false, "sing-box server check failed after restore" end
 	return true
 end
 
@@ -104,22 +111,32 @@ local function create()
 	mkdir_p(data_dir)
 	local ts = os.date("%Y%m%d-%H%M%S")
 	local path = target ~= "" and target or (backup_dir .. "/singboxwall-" .. ts .. ".tar.gz")
-	local manifest = data_dir .. "/backup-manifest.json"
+	local staging = "/tmp/singboxwall-backup-" .. ts .. "." .. tostring(math.random(1000, 9999))
+	local staged_data = staging .. "/etc/singboxwall"
+	local manifest = staged_data .. "/backup-manifest.json"
+	mkdir_p(staged_data)
+	if exists(data_dir) and not cp(data_dir .. "/.", staged_data) then
+		io.stderr:write("failed to stage data directory\n")
+		rm_rf(staging)
+		os.exit(1)
+	end
 	local f = io.open(manifest, "w")
 	if f then
 		f:write('{"name":"singboxwall","created_at":"' .. ts .. '","format":1,"generator":"0.1.0"}\n')
 		f:close()
 	end
 	local include_cache = capture("uci -q get singboxwall.backup.include_cache"):gsub("%s+$", "")
-	local exclude_cache = ""
+	local exclude_cache = " --exclude=etc/singboxwall/backups"
 	if include_cache ~= "1" and include_cache ~= "true" and include_cache ~= "yes" then
-		exclude_cache = " --exclude=etc/singboxwall/cache.db --exclude=etc/singboxwall/cache.db-*"
+		exclude_cache = exclude_cache .. " --exclude=etc/singboxwall/cache.db --exclude=etc/singboxwall/cache.db-*"
 	end
-	local cmd = "tar -czf " .. shell_quote(path) .. exclude_cache .. " -C / etc/config/singboxwall -C / etc/singboxwall"
+	local cmd = "tar -czf " .. shell_quote(path) .. exclude_cache .. " -C / etc/config/singboxwall -C " .. shell_quote(staging) .. " etc/singboxwall"
 	if run(cmd) then
 		print('{"ok":true,"path":"' .. json_escape(path) .. '"}')
+		rm_rf(staging)
 	else
 		io.stderr:write("failed to create backup\n")
+		rm_rf(staging)
 		os.exit(1)
 	end
 end

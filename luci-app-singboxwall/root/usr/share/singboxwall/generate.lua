@@ -252,6 +252,7 @@ local sing_box_bin = opt(global, "sing_box_bin", "/usr/bin/sing-box")
 local version_output = run_capture(shell_quote(sing_box_bin) .. " version") or ""
 local sing_box_version = version_output:match("(%d+%.%d+%.%d+)") or os.getenv("SINGBOXWALL_ASSUME_VERSION") or opt(global, "assume_sing_box_version", "1.13.11")
 local supports_113 = version_ge(sing_box_version, "1.13.0")
+local supports_1133 = version_ge(sing_box_version, "1.13.3")
 local supports_114 = version_ge(sing_box_version, "1.14.0")
 local tmp_dir = os.getenv("SINGBOXWALL_OUTPUT_DIR") or opt(global, "temp_dir", "/tmp/etc/singboxwall")
 local data_dir = os.getenv("SINGBOXWALL_DATA_DIR") or opt(global, "data_dir", "/etc/singboxwall")
@@ -508,9 +509,13 @@ if truthy(opt(inbound, "tun_enabled", "1")) then
 		mtu = mtu,
 		auto_route = truthy(opt(inbound, "tun_auto_route", "1")),
 		auto_redirect = truthy(opt(inbound, "tun_auto_redirect", "1")),
-		strict_route = truthy(opt(inbound, "tun_strict_route", "1")),
 		stack = opt(inbound, "tun_stack", "system")
 	}
+	if supports_1133 then
+		tun.strict_route = truthy(opt(inbound, "tun_strict_route", "1"))
+	elseif truthy(opt(inbound, "tun_strict_route", "1")) then
+		warn("TUN strict_route requires sing-box >= 1.13.3; omitted for " .. sing_box_version)
+	end
 	if #tun.address == 0 then tun.address = { "172.19.0.1/30" } end
 	inbounds[#inbounds + 1] = tun
 end
@@ -777,7 +782,7 @@ if server then
 else
 	os.remove(tmp_dir .. "/server.json")
 end
-write_file(tmp_dir .. "/warnings.json", encode_json({ warnings = warnings, sing_box_version = sing_box_version, supports_114 = supports_114 }))
+write_file(tmp_dir .. "/warnings.json", encode_json({ warnings = warnings, sing_box_version = sing_box_version, supports_1133 = supports_1133, supports_114 = supports_114 }))
 
 if #warnings > 0 then
 	for _, msg in ipairs(warnings) do io.stderr:write("warning: " .. msg .. "\n") end
