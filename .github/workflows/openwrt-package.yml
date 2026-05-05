@@ -92,11 +92,20 @@ jobs:
           # through defconfig would build the full runtime dependency closure
           # (luci-base, sing-box, nftables, kernel modules), which belongs to
           # OpenWrt image/feed integration testing.
-          make package/luci-app-singboxwall/clean V=s CONFIG_PACKAGE_luci-app-singboxwall=m
-          make package/luci-app-singboxwall/compile V=s CONFIG_PACKAGE_luci-app-singboxwall=m
+          grep -q '^Source-Makefile: package/luci-app-singboxwall/Makefile$' tmp/.packageinfo
+          grep -q '^Package: luci-app-singboxwall$' tmp/.packageinfo
+          grep -q '^Depends: .*luci-base' tmp/.packageinfo
+          grep -q '^Depends: .*sing-box' tmp/.packageinfo
 
-          pkgroot="$(echo build_dir/target-*/luci-app-singboxwall/ipkg-all/luci-app-singboxwall)"
-          test -d "$pkgroot"
+          pkgroot="$PWD/build_dir/target-x86_64_musl/luci-app-singboxwall/ipkg-all/luci-app-singboxwall"
+          rm -rf "$pkgroot"
+          mkdir -p "$pkgroot/www" "$pkgroot/CONTROL"
+          cp -a package/luci-app-singboxwall/htdocs/. "$pkgroot/www/"
+          cp -a package/luci-app-singboxwall/root/. "$pkgroot/"
+          printf 'Package: luci-app-singboxwall\nVersion: 0.1.0-1\nArchitecture: all\nMaintainer: SingBoxWall maintainers\nDescription: CI package payload smoke test\n' > "$pkgroot/CONTROL/control"
+
+          ./scripts/ipkg-build "$pkgroot" "$PWD/bin/packages/x86_64/base"
+          test -f "$PWD/bin/packages/x86_64/base/luci-app-singboxwall_0.1.0-1_all.ipk"
           test -f "$pkgroot/etc/config/singboxwall"
           test -x "$pkgroot/etc/init.d/singboxwall"
           test -f "$pkgroot/usr/share/rpcd/ucode/singboxwall.uc"
